@@ -4,23 +4,19 @@ pub struct Resource<'a> {
     path: &'a str,
 }
 
-pub fn setUpServer<'a>() -> Vec<Resource<'a>> {
-    return vec![];
+pub fn setUpServer<'a>() {
+    let resources = find_resources();
+    resources.into_iter().for_each(|r| println!("{}", r));
 }
 
 fn find_resources() -> Vec<String> {
     let mut resources: Vec<String> = vec![];
-    let paths = fs::read_dir("./").unwrap();
+    let paths = fs::read_dir("./src/resources").unwrap();
     for path in paths {
-        let path_name = match path {
-            Ok(t) => t,
-            Err(e) => unwrap_failed("called `Result::unwrap()` on an `Err` value", &e),
-        }
-        .path()
-        .to_str()
-        .unwrap();
-        println!("{}", path_name);
-        resources.push(path_name.to_string());
+        let path_temp = path.unwrap().path();
+        let test = path_temp.to_str().unwrap();
+        println!("{}", test);
+        resources.push(test.to_string());
     }
     return resources;
 }
