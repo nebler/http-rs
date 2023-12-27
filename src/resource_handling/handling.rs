@@ -4,6 +4,7 @@ pub fn set_up_server<'a>() {
     resources.into_iter().for_each(|r| println!("{}", r));
 }
 
+// TODO: actually do something with this
 fn find_resources() -> Vec<String> {
     let mut resources: Vec<String> = vec![];
     let paths = fs::read_dir("./resources").unwrap();

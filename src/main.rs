@@ -20,7 +20,6 @@ fn main() {
         match stream {
             Ok(stream) => {
                 handle_connection(stream);
-                println!("accepted new connection");
             }
             Err(e) => {
                 println!("error: {}", e);
@@ -28,9 +27,7 @@ fn main() {
         }
     }
 }
-
 fn handle_connection(mut stream: TcpStream) {
-    stream.write("HTTP/1.1 200 OK\r\n\r\n".as_bytes()).unwrap();
     let buf_reader = BufReader::new(&mut stream);
     let http_request: Vec<_> = buf_reader
         .lines()
@@ -44,20 +41,22 @@ fn handle_connection(mut stream: TcpStream) {
         .collect();
 
     let (http_method, resource) = (&first_line[0], &first_line[1]);
+
+    let contents = if (resource.eq("/")) {
+        include_str!("../resources/hello.html").to_string()
+    } else {
+        // TODO: do something with the rest of the files like how do I handle pics and js?
+        include_str!("../resources/hello.html").to_string()
+        // println!("{}", resource);
+        // let path = "./resources".to_owned() + resource;
+        // fs::read_to_string(path).unwrap().to_string()
+    };
     println!("httpMethod: {}, resources: {}", http_method, resource);
     let status_line = "HTTP/1.1 200 OK";
-    let mut contents = "";
-    if (resource == "/") {
-        contents = include_str!("../resources/hello.html");
-        stream.write_all(contents.as_bytes()).unwrap();
-    } else {
-        let path = "./resources/".to_owned() + resource;
-        stream
-            .write_all(&fs::read_to_string(path).unwrap().as_bytes())
-            .unwrap();
-    }
     let length = contents.len();
+    //TODO: set all the other headers here as well?
     let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
     println!("Request: {:#?}", http_request);
     println!("{}", response);
+    stream.write_all(response.as_bytes()).unwrap()
 }
