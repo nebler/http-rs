@@ -1,0 +1,4 @@
+-   [ ] Sending over all type of files through TCP
+-   [ ] Structure code in a more cohesive way
+-   [ ] Implement all HTTP Methods
+-   [ ] TLS Handshake
